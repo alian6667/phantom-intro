@@ -32,6 +32,66 @@ button{font-family:inherit;background:none;border:none;cursor:pointer;color:inhe
 img{-webkit-user-drag:none;}
 
 /* ============ Stage 0 : Calling Card ============ */
+/* ---- Entry gate (black screen, click to enter) ---- */
+#gate{
+  position:fixed;inset:0;z-index:60;background:var(--black);
+  display:flex;align-items:center;justify-content:center;cursor:pointer;
+  overflow:hidden;
+}
+#gate .g-bg{
+  position:absolute;left:50%;top:50%;width:110vmin;height:110vmin;
+  transform:translate(-50%,-50%);
+  background:radial-gradient(circle,rgba(230,0,18,.28) 0%,rgba(230,0,18,.1) 45%,transparent 72%);
+  animation:glowPulse 3s ease-in-out infinite;
+}
+#gate .g-redstrip{
+  position:absolute;left:0;right:0;top:50%;height:14vmin;
+  background:var(--red);transform:skewY(-6deg) translateY(-50%);
+  box-shadow:0 0 6vmin rgba(230,0,18,.55);
+  animation:stripIn 1s cubic-bezier(.16,1.3,.3,1) .3s backwards;
+}
+@keyframes stripIn{0%{transform:skewY(-6deg) translateY(-50%) scaleX(.2);opacity:0;}100%{transform:skewY(-6deg) translateY(-50%) scaleX(1);opacity:1;}}
+#gate .g-inner{
+  position:relative;z-index:2;text-align:center;letter-spacing:.08em;
+}
+#gate .g-school{
+  font-family:var(--f-head);font-weight:700;
+  font-size:clamp(15px,2.2vw,26px);color:var(--white);
+  text-shadow:3px 3px 0 var(--red);
+  transform:skew(-8deg);margin-bottom:1.2vmin;
+  animation:riseIn .8s ease .5s backwards;
+}
+#gate .g-major{
+  font-family:var(--f-head);font-weight:700;
+  font-size:clamp(12px,1.7vw,20px);color:var(--gray);
+  letter-spacing:.5em;margin-bottom:5vmin;
+  animation:riseIn .8s ease .7s backwards;
+}
+#gate .g-name{
+  font-family:var(--f-disp);
+  font-size:clamp(64px,12vw,150px);
+  font-weight:700;line-height:1;color:var(--white);
+  text-shadow:8px 8px 0 var(--red), -2px -2px 0 rgba(255,255,255,.12);
+  transform:skew(-8deg);
+  animation:nameIn 1s cubic-bezier(.16,1.3,.3,1) .2s backwards;
+}
+@keyframes nameIn{0%{opacity:0;transform:skew(-8deg) translateY(6vh) scale(1.15);}100%{opacity:1;transform:skew(-8deg) translateY(0) scale(1);}}
+@keyframes riseIn{from{opacity:0;transform:skew(-8deg) translateY(2vh);}to{opacity:1;transform:skew(-8deg) translateY(0);}}
+#gate .g-tag{
+  margin-top:5vmin;font-family:var(--f-mono);
+  font-size:clamp(11px,1.5vw,16px);color:var(--white);
+  letter-spacing:.45em;opacity:.8;
+  animation:riseIn .8s ease .9s backwards;
+}
+#gate .g-hint{
+  position:absolute;left:50%;bottom:6vh;transform:translateX(-50%);
+  font-family:var(--f-mono);font-size:clamp(12px,1.6vw,17px);
+  letter-spacing:.35em;color:var(--white);
+  text-shadow:2px 2px 0 var(--red);
+  animation:hintBlink 1.4s steps(2) 1.4s infinite;
+}
+#gate.gone{transition:opacity .45s ease;opacity:0;pointer-events:none;}
+
 #stage-card{
   position:fixed;inset:0;z-index:40;background:var(--black);
   display:flex;align-items:center;justify-content:center;cursor:pointer;
@@ -1302,6 +1362,19 @@ img{-webkit-user-drag:none;}
       0.60 -1.60 0.60 0  1.35"/>
   </filter>
 </svg>
+
+<!-- ================= Gate : Click-to-Enter ================= -->
+<div id="gate">
+  <div class="g-bg"></div>
+  <div class="g-redstrip"></div>
+  <div class="g-inner">
+    <div class="g-school">常州信息职业技术大学</div>
+    <div class="g-major">软件工程 262</div>
+    <div class="g-name">林欣怡</div>
+    <div class="g-tag">TAKE YOUR HEART — PHANTOM INTRO</div>
+  </div>
+  <div class="g-hint">— CLICK TO ENTER —</div>
+</div>
 
 <!-- ================= Stage 0 : Calling Card ================= -->
 <div id="stage-card">
