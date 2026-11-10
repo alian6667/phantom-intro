@@ -6,6 +6,7 @@
 };
 
   var stageCard = $('#stage-card');
+  var gate = $('#gate');
   var shatterLayer = $('#shatter-layer');
   var shatterFlash = $('#shatter-flash');
   var stageSubway = $('#stage-subway');
@@ -14,7 +15,7 @@
   var subwayHint = $('#subway-hint');
   var subwayVideo = $('#subway-video');
 
-  var state = 'card';      // card → subway → phone → sub
+  var state = 'gate';      // gate → card → subway → phone → sub
   var lock = false;
   var currentSub = null;
 
@@ -51,14 +52,14 @@
 
   /* ================= calling card background music ================= */
   var cardBgm = $('#cardBgm');
-  var cardBgmUnlocked = false;   // becomes true after first successful play
+  var cardBgmUnlocked = false;
   function playCardBgm() {
     if (!cardBgm) return;
     cardBgm.volume = 0.6;
     var p = cardBgm.play();
     if (p && typeof p.then === 'function') {
       p.then(function () { cardBgmUnlocked = true; })
-       .catch(function () { /* blocked; will retry on next user gesture */ });
+       .catch(function () { /* blocked */ });
     } else {
       cardBgmUnlocked = true;
     }
@@ -67,20 +68,27 @@
     if (!cardBgm) return;
     cardBgm.pause();
   }
-  // try autoplay on load; if blocked, retry on EVERY user click until success
-  playCardBgm();
-  document.addEventListener('click', function unlockCardBgm() {
-    if (!cardBgmUnlocked && state === 'card' && cardBgm && cardBgm.paused) {
+  // NO autoplay on load — wait for user click on gate
+  // Gate click handler: dismiss gate, enter card stage, start card BGM
+  if (gate) {
+    gate.addEventListener('click', function enterFromGate() {
+      if (state !== 'gate') return;
+      state = 'card';
+      gate.classList.add('gone');
+      // start card BGM on user gesture (browser-allowed)
+      playCardBgm();
+      // also start subway video playback (still muted, no audio)
+      startVideo();
+      // remove gate from DOM after fade
+      setTimeout(function () { if (gate && gate.parentNode) gate.parentNode.removeChild(gate); }, 500);
+    });
+  }
+  // fallback: if user clicks anywhere while still on gate (e.g. missed), retry
+  document.addEventListener('click', function () {
+    if (state === 'card' && !cardBgmUnlocked && cardBgm && cardBgm.paused) {
       playCardBgm();
     }
   });
-  // also try on pointerdown for better browser compatibility
-  document.addEventListener('pointerdown', function () {
-    if (!cardBgmUnlocked && state === 'card' && cardBgm && cardBgm.paused) {
-      playCardBgm();
-    }
-  });
-  startVideo();
 
   /* ================= future page background music ================= */
   var futureBgm = $('#futureBgm');
