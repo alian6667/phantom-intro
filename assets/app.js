@@ -51,21 +51,35 @@
 
   /* ================= calling card background music ================= */
   var cardBgm = $('#cardBgm');
+  var cardBgmUnlocked = false;   // becomes true after first successful play
   function playCardBgm() {
     if (!cardBgm) return;
     cardBgm.volume = 0.6;
     var p = cardBgm.play();
-    if (p && typeof p.catch === 'function') p.catch(function () {});
+    if (p && typeof p.then === 'function') {
+      p.then(function () { cardBgmUnlocked = true; })
+       .catch(function () { /* blocked; will retry on next user gesture */ });
+    } else {
+      cardBgmUnlocked = true;
+    }
   }
   function stopCardBgm() {
     if (!cardBgm) return;
     cardBgm.pause();
   }
-  // try autoplay on load; if blocked, retry on first user gesture
+  // try autoplay on load; if blocked, retry on EVERY user click until success
   playCardBgm();
   document.addEventListener('click', function unlockCardBgm() {
-    if (state === 'card') playCardBgm();
-  }, { once: true });
+    if (!cardBgmUnlocked && state === 'card' && cardBgm && cardBgm.paused) {
+      playCardBgm();
+    }
+  });
+  // also try on pointerdown for better browser compatibility
+  document.addEventListener('pointerdown', function () {
+    if (!cardBgmUnlocked && state === 'card' && cardBgm && cardBgm.paused) {
+      playCardBgm();
+    }
+  });
   startVideo();
 
   /* ================= future page background music ================= */
